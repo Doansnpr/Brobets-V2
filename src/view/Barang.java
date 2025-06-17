@@ -2,8 +2,6 @@
 package view;
 
 import event.EventMenuSwitch;
-import form.FormTambahBarang;
-import form.FormUbahBarang;
 import java.awt.Color;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;

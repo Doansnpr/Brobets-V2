@@ -1,8 +1,6 @@
 
 package view;
 
-import form.FormTambahPemasok;
-import form.FormUbahPemasok;
 import java.awt.Color;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;

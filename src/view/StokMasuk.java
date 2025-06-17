@@ -1,7 +1,6 @@
 
 package view;
 
-import form.FormTambahStok;
 import java.awt.Color;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
