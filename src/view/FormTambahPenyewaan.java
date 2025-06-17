@@ -1,7 +1,7 @@
 
 package view;
 
-import form.*;
+
 import java.awt.Color;
 import javax.swing.JOptionPane;
 

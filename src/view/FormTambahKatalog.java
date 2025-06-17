@@ -1,9 +1,6 @@
 
 package view;
 
-import form.*;
-
-
 public class FormTambahKatalog extends javax.swing.JPanel {
 
     public FormTambahKatalog() {

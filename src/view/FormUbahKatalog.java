@@ -1,8 +1,6 @@
 
 package view;
 
-import form.*;
-
 
 public class FormUbahKatalog extends javax.swing.JPanel {
 

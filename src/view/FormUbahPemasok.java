@@ -1,8 +1,6 @@
 
 package view;
 
-import form.*;
-
 
 public class FormUbahPemasok extends javax.swing.JPanel {
 

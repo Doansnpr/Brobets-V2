@@ -1,8 +1,6 @@
 
 package view;
 
-import form.*;
-
 
 public class FormTambahBarang extends javax.swing.JPanel {
 

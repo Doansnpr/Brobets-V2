@@ -1,8 +1,6 @@
 
 package view;
 
-import form.*;
-
 
 public class FormTambahStok extends javax.swing.JPanel {
 
