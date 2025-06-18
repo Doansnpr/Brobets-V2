@@ -4,12 +4,25 @@ package view;
 import java.awt.Color;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Katalog extends javax.swing.JPanel {
 
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
  
     public Katalog() {
         initComponents();
+        Koneksi DB = new Koneksi();
+        DB.config();
+        con = DB.con;
+        
+        load_katalog();
         
         search.setText("Search");
         search.setForeground(Color.white);
@@ -32,9 +45,84 @@ public class Katalog extends javax.swing.JPanel {
             }
         });
         
+        search.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                searchKatalog();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                searchKatalog();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                searchKatalog();
+            }
+        });
+        
         
     }
 
+    
+    private void load_katalog() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Katalog");
+        model.addColumn("Nama Katalog");
+
+        try {
+            Connection con = Koneksi.getConnection();
+            String sql = "SELECT * FROM katalog ORDER BY id_katalog ASC";
+            PreparedStatement pst = con.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("id_katalog"),
+                    rs.getString("nama_katalog")
+                });
+            }
+
+            tbl_katalog.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal memuat data katalog: " + e.getMessage());
+        }
+    }
+    
+    private void searchKatalog() {
+    String keyword = search.getText().trim(); // Field input pencarian
+
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID Katalog");
+    model.addColumn("Nama Katalog");
+
+    try {
+        Connection con = Koneksi.getConnection();
+
+        String sql = "SELECT * FROM katalog WHERE nama_katalog LIKE ? ORDER BY id_katalog ASC";
+        PreparedStatement pst = con.prepareStatement(sql);
+        pst.setString(1, "%" + keyword + "%");
+        ResultSet rs = pst.executeQuery();
+
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("id_katalog"),
+                rs.getString("nama_katalog")
+            });
+        }
+
+        tbl_katalog.setModel(model); // Tampilkan hasil ke tabel
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencari katalog: " + e.getMessage());
+    }
+}
+
+    
+    public void onShow() {
+        load_katalog(); // atau fungsi refresh data
+    }
    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -42,7 +130,7 @@ public class Katalog extends javax.swing.JPanel {
 
         jLabel4 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable_Custom22 = new palette.JTable_Custom2();
+        tbl_katalog = new palette.JTable_Custom2();
         btn_hapus = new javax.swing.JButton();
         btn_tambah = new javax.swing.JButton();
         btn_ubah = new javax.swing.JButton();
@@ -55,7 +143,7 @@ public class Katalog extends javax.swing.JPanel {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Data Katalog");
 
-        jTable_Custom22.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_katalog.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},
                 {null, null},
@@ -74,7 +162,7 @@ public class Katalog extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane2.setViewportView(jTable_Custom22);
+        jScrollPane2.setViewportView(tbl_katalog);
 
         btn_hapus.setContentAreaFilled(false);
 
@@ -82,6 +170,11 @@ public class Katalog extends javax.swing.JPanel {
         btn_hapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_hapus.png"))); // NOI18N
         btn_hapus.setBorder(null);
         btn_hapus.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_hapus_select.png"))); // NOI18N
+        btn_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_hapusActionPerformed(evt);
+            }
+        });
 
         btn_tambah.setContentAreaFilled(false);
 
@@ -161,6 +254,10 @@ public class Katalog extends javax.swing.JPanel {
     private void btn_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_tambahActionPerformed
         // TODO add your handling code here:
         FormTambahKatalog panel = new FormTambahKatalog();
+        panel.setUpdateListener(() -> {
+            load_katalog();
+        });
+
 
         JDialog dialog = new JDialog();
         dialog.setTitle("Data Barang");
@@ -174,7 +271,25 @@ public class Katalog extends javax.swing.JPanel {
 
     private void btn_ubahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ubahActionPerformed
         // TODO add your handling code here:
+        
+        int selectedRow = tbl_katalog.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Ambil semua data dari tabel
+        DefaultTableModel model = (DefaultTableModel) tbl_katalog.getModel();
+        String idKatalog = String.valueOf(model.getValueAt(selectedRow, 0));
+        String namaKatalog = String.valueOf(model.getValueAt(selectedRow, 1));
+     
         FormUbahKatalog panel = new FormUbahKatalog();
+        panel.setDataKatalog(idKatalog, namaKatalog);
+
+        // Listener untuk reload tabel setelah update
+        panel.setBarangUpdateListener(() -> {
+            load_katalog();
+        });
 
         JDialog dialog = new JDialog();
         dialog.setTitle("Data Barang");
@@ -195,6 +310,44 @@ public class Katalog extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_searchActionPerformed
 
+    private void btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_hapusActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = tbl_katalog.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) tbl_katalog.getModel();
+        String idKatalog = (String) model.getValueAt(selectedRow, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin menghapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+
+            String sql = "DELETE FROM katalog WHERE id_katalog = ?";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, idKatalog);
+
+            int rowsAffected = pst.executeUpdate();
+
+            if (rowsAffected > 0) {
+                model.removeRow(selectedRow);
+                JOptionPane.showMessageDialog(this, "Data berhasil dihapus.", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Gagal menghapus data.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            pst.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Katalog error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_hapusActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_hapus;
@@ -203,7 +356,7 @@ public class Katalog extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane2;
-    private palette.JTable_Custom2 jTable_Custom22;
     private palette.JTextField_Rounded search;
+    private palette.JTable_Custom2 tbl_katalog;
     // End of variables declaration//GEN-END:variables
 }

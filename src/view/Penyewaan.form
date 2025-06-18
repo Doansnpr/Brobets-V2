@@ -110,6 +110,9 @@
           <Image iconType="3" name="/assets/btn_hapus_select.png"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_hapusActionPerformed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_hapus.setContentAreaFilled(false);&#xa;&#xa;btn_hapus.setBorderPainted(false);"/>
       </AuxValues>
@@ -126,8 +129,11 @@
           <Image iconType="3" name="/assets/btn_detail (1).png"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_detailActionPerformed"/>
+      </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_hapus.setContentAreaFilled(false);&#xa;&#xa;btn_hapus.setBorderPainted(false);"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_detail.setContentAreaFilled(false);&#xa;&#xa;btn_detail.setBorderPainted(false);"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btn_nota">
@@ -142,8 +148,11 @@
           <Image iconType="3" name="/assets/btn_nota_select.png"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_notaActionPerformed"/>
+      </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_hapus.setContentAreaFilled(false);&#xa;&#xa;btn_hapus.setBorderPainted(false);"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_nota.setContentAreaFilled(false);&#xa;&#xa;btn_nota.setBorderPainted(false);"/>
       </AuxValues>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane2">
@@ -153,7 +162,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="palette.JTable_Custom2" name="jTable_Custom21">
+        <Component class="palette.JTable_Custom2" name="table_sewa">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="8" rowCount="4">

@@ -40,34 +40,38 @@ public class JTable_Custom extends JTable {
             }
         });
         
-        setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                Component com = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                setBorder(noFocusBorder);
-                if (isSelected) {
-                    com.setForeground(new Color(15, 89, 140));
-                    com.setBackground(new Color(214, 234, 248));
-                } else if (row == hoveredRow) {
-                    com.setBackground(new Color(48,85,85));
-                    com.setForeground(Color.WHITE);
-                } else {
-                    if (row % 2 == 0) {
-                        com.setBackground(Color.WHITE);
-                    } else {
-                        com.setBackground(new Color(245, 245, 245));
-                    }
-                    com.setForeground(new Color(102, 102, 102));
-                }
+      setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean isSelected, boolean hasFocus,
+                                                   int row, int column) {
+        Component com = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-                return com;
+        if (com instanceof JLabel label) {
+            label.setBorder(noFocusBorder); // ⬅️ gunakan instance yang benar
+            if (isSelected) {
+                label.setForeground(new Color(15, 89, 140));
+                label.setBackground(new Color(214, 234, 248));
+            } else if (row == hoveredRow) {
+                label.setBackground(new Color(48, 85, 85));
+                label.setForeground(Color.WHITE);
+            } else {
+                if (row % 2 == 0) {
+                    label.setBackground(Color.WHITE);
+                } else {
+                    label.setBackground(new Color(245, 245, 245));
+                }
+                label.setForeground(new Color(102, 102, 102));
             }
-        });
+        }
+
+        return com;
+    }
+});
+
 
         
-         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
         @Override
         public void mouseMoved(MouseEvent e) {
             int row = rowAtPoint(e.getPoint());
@@ -85,16 +89,6 @@ public class JTable_Custom extends JTable {
             repaint();
         }
         
-         @Override
-        public void mouseClicked(MouseEvent e) {
-            int row = getSelectedRow();
-            if (row == selectedRow) {
-                clearSelection();
-                selectedRow = -1;
-            } else {
-                selectedRow = row;
-            }
-        }
         });
 
 

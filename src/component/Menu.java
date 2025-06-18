@@ -21,6 +21,8 @@ public class Menu extends javax.swing.JPanel {
     private MenuButton unSelectedMenu;
     private Animator animator;
     private MenuEvent event;
+    private String userLevel;
+
 
     public Menu() {
         initComponents();
@@ -44,8 +46,16 @@ public class Menu extends javax.swing.JPanel {
         animator.setResolution(0);
     }
     
+    
+    public void setUserLevel(String level) {
+        this.userLevel = level;
+    }
+
+    
     public void initMenu(MenuEvent event) {
-        this.event = event;
+    this.event = event;
+
+    if ("pegawai".equalsIgnoreCase(userLevel)) {
         addMenu("icon_dash", "Dashboard", 0);
         split("Master");
         addMenu("icon_items", "Barang", 1);
@@ -56,9 +66,17 @@ public class Menu extends javax.swing.JPanel {
         split("Transaksi");
         addMenu("icon_penyewaan", "Penyewaan", 6);
         addMenu("icon_pengembalian", "Pengembalian", 7);
-        space();
-        addMenu("icon_logout", "Logout", 7);
+    } else if ("owner".equalsIgnoreCase(userLevel)) {
+        addMenu("icon_dash", "Dashboard", 8);
+        split("Master");
+        addMenu("icon_pengguna", "Pengguna", 9);
+        addMenu("icon_laporan", "Laporan", 10);
     }
+
+    space();
+    addMenu("icon_logout", "Logout", 99);
+}
+
 
     private void addMenu(String icon, String text, int index) {
         MenuButton menu = new MenuButton(index);
@@ -91,20 +109,24 @@ public class Menu extends javax.swing.JPanel {
         panelMenu.add(new Split(name), "h 30");
     }
     
-    public void setSelected(int index) {
-        for (Component com : panelMenu.getComponents()) {
-            MenuButton menu = (MenuButton) com;
+   public void setSelected(int index) {
+    for (Component com : panelMenu.getComponents()) {
+        if (com instanceof MenuButton menu) {
             if (menu.getIndex() == index) {
                 if (menu != selectedMenu) {
                     unSelectedMenu = selectedMenu;
                     selectedMenu = menu;
                     animator.start();
-                    event.menuSelected(index);
+                    if (event != null) {
+                        event.menuSelected(index);
+                    }
                 }
                 break;
             }
         }
     }
+}
+
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

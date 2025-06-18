@@ -1,12 +1,51 @@
 
 package view;
 
+import event.BarangUpdateListener;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.SwingUtilities;
 
 public class FormTambahPemasok extends javax.swing.JPanel {
 
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    private BarangUpdateListener updateListener;
+    
     public FormTambahPemasok() {
         initComponents();
+        
+        Koneksi DB = new Koneksi();
+        DB.config();
+        con = DB.con;
   
+    }
+    
+    public void setUpdateListener(BarangUpdateListener listener) {
+        this.updateListener = listener;
+    }
+    
+    private String generateID(String tableName, String idColumn, String prefix) {
+        String newID = prefix + "001";
+        try {
+            String sql = "SELECT " + idColumn + " FROM " + tableName + 
+                         " WHERE " + idColumn + " LIKE ? ORDER BY " + idColumn + " DESC LIMIT 1";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, prefix + "%");
+            rs = pst.executeQuery();
+            if (rs.next()) {
+                String lastID = rs.getString(1); // Misal: BMS006
+                int num = Integer.parseInt(lastID.substring(prefix.length())); // 6
+                num++; // 7
+                newID = prefix + String.format("%03d", num); // BMS007
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal generate ID: " + e.getMessage());
+        }
+        return newID;
     }
 
    
@@ -47,6 +86,11 @@ public class FormTambahPemasok extends javax.swing.JPanel {
         btn_simpan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan.png"))); // NOI18N
         btn_simpan.setBorder(null);
         btn_simpan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan_select.png"))); // NOI18N
+        btn_simpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_simpanActionPerformed(evt);
+            }
+        });
 
         btn_batal.setContentAreaFilled(false);
 
@@ -54,6 +98,11 @@ public class FormTambahPemasok extends javax.swing.JPanel {
         btn_batal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal.png"))); // NOI18N
         btn_batal.setBorder(null);
         btn_batal.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal_select.png"))); // NOI18N
+        btn_batal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_batalActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -66,6 +115,12 @@ public class FormTambahPemasok extends javax.swing.JPanel {
         jLabel10.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("No. Telepon");
+
+        txt_telp.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_telpKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout pn_tambahLayout = new javax.swing.GroupLayout(pn_tambah);
         pn_tambah.setLayout(pn_tambahLayout);
@@ -122,15 +177,75 @@ public class FormTambahPemasok extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(0, 1, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(pn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 1, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txt_telpKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_telpKeyTyped
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && c != '\b') {
+            evt.consume(); // mencegah karakter non-angka diketik
+        }
+
+    }//GEN-LAST:event_txt_telpKeyTyped
+
+    private void btn_batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_batalActionPerformed
+        // TODO add your handling code here:
+        SwingUtilities.getWindowAncestor(this).dispose();
+    }//GEN-LAST:event_btn_batalActionPerformed
+
+    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
+        String idPemasok = generateID("pemasok", "id_pemasok", "PS");
+        String namaPemasok = txt_nama_pemasok.getText().trim();
+        String noTelp = txt_telp.getText().trim();
+        String alamat = txt_alamat.getText().trim();
+
+        if (namaPemasok.isEmpty() || namaPemasok.equals("Masukkan Nama Pemasok") ||
+            noTelp.isEmpty() || noTelp.equals("Masukkan Nomer Telepon") ||
+            alamat.isEmpty() || alamat.equals("Masukkan Alamat")) {
+            JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            Connection con = Koneksi.getConnection();
+
+            String cekSql = "SELECT COUNT(*) FROM pemasok WHERE nama_pemasok = ?";
+            PreparedStatement cekPst = con.prepareStatement(cekSql);
+            cekPst.setString(1, namaPemasok);
+            ResultSet rs = cekPst.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "Nama pemasok sudah ada!", "Duplikat", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String sql = "INSERT INTO pemasok (id_pemasok, nama_pemasok, no_telp, alamat) VALUES (?, ?, ?, ?)";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, idPemasok);
+            pst.setString(2, namaPemasok);
+            pst.setString(3, noTelp);
+            pst.setString(4, alamat);
+            pst.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Pemasok berhasil ditambahkan!");
+
+            if (updateListener != null) {
+                updateListener.onBarangUpdated();
+            }
+
+            SwingUtilities.getWindowAncestor(this).dispose();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal menambahkan pemasok: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btn_simpanActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
