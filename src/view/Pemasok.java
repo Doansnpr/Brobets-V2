@@ -2,16 +2,29 @@
 package view;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 
 public class Pemasok extends javax.swing.JPanel {
 
-  
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    
     public Pemasok() {
         initComponents();
+        Koneksi DB = new Koneksi();
+        DB.config();
+        con = DB.con;
         
+        load_pemasok();
+                
         search.setText("Search");
         search.setForeground(Color.white);
 
@@ -32,8 +45,90 @@ public class Pemasok extends javax.swing.JPanel {
                 }
             }
         });
+        
+        search.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                searchPemasok();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                searchPemasok();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                searchPemasok();
+            }
+        });
     }
 
+    private void load_pemasok() {
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID Pemasok");
+    model.addColumn("Nama Pemasok");
+    model.addColumn("No. Telepon");
+    model.addColumn("Alamat");
+
+    try {
+        Connection con = Koneksi.getConnection();
+        String sql = "SELECT * FROM pemasok ORDER BY id_pemasok ASC";
+        PreparedStatement pst = con.prepareStatement(sql);
+        ResultSet rs = pst.executeQuery();
+
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("id_pemasok"),
+                rs.getString("nama_pemasok"),
+                rs.getString("no_telp"),
+                rs.getString("alamat")
+            });
+        }
+
+        tbl_pemasok.setModel(model); // ganti sesuai nama JTable kamu
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat data pemasok: " + e.getMessage());
+    }
+}
+
+    private void searchPemasok() {
+    String keyword = search.getText().trim(); // ganti dengan nama JTextField pencarian kamu
+
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID Pemasok");
+    model.addColumn("Nama Pemasok");
+    model.addColumn("No. Telepon");
+    model.addColumn("Alamat");
+
+    try {
+        Connection con = Koneksi.getConnection();
+        String sql = "SELECT * FROM pemasok WHERE nama_pemasok LIKE ? OR no_telp LIKE ? OR alamat LIKE ? ORDER BY id_pemasok ASC";
+        PreparedStatement pst = con.prepareStatement(sql);
+        pst.setString(1, "%" + keyword + "%");
+        pst.setString(2, "%" + keyword + "%");
+        pst.setString(3, "%" + keyword + "%");
+
+        ResultSet rs = pst.executeQuery();
+
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("id_pemasok"),
+                rs.getString("nama_pemasok"),
+                rs.getString("no_telp"),
+                rs.getString("alamat")
+            });
+        }
+
+        tbl_pemasok.setModel(model);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencari pemasok: " + e.getMessage());
+    }
+}
+
+    public void onShow() {
+        load_pemasok(); 
+    }
  
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -41,7 +136,7 @@ public class Pemasok extends javax.swing.JPanel {
 
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable_Custom21 = new palette.JTable_Custom2();
+        tbl_pemasok = new palette.JTable_Custom2();
         btn_hapus = new javax.swing.JButton();
         btn_tambah = new javax.swing.JButton();
         btn_ubah = new javax.swing.JButton();
@@ -54,7 +149,7 @@ public class Pemasok extends javax.swing.JPanel {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Data Pemasok");
 
-        jTable_Custom21.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_pemasok.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -65,7 +160,7 @@ public class Pemasok extends javax.swing.JPanel {
                 "Nama Pemasok", "Nomer Telepon", "Alamat"
             }
         ));
-        jScrollPane1.setViewportView(jTable_Custom21);
+        jScrollPane1.setViewportView(tbl_pemasok);
 
         btn_hapus.setContentAreaFilled(false);
 
@@ -73,6 +168,11 @@ public class Pemasok extends javax.swing.JPanel {
         btn_hapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_hapus.png"))); // NOI18N
         btn_hapus.setBorder(null);
         btn_hapus.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_hapus_select.png"))); // NOI18N
+        btn_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_hapusActionPerformed(evt);
+            }
+        });
 
         btn_tambah.setContentAreaFilled(false);
 
@@ -161,7 +261,11 @@ public class Pemasok extends javax.swing.JPanel {
     private void btn_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_tambahActionPerformed
         // TODO add your handling code here:
         FormTambahPemasok panel = new FormTambahPemasok();
+        panel.setUpdateListener(() -> {
+            load_pemasok();
+        });
 
+        
         JDialog dialog = new JDialog();
         dialog.setTitle("Data Pemasok");
         dialog.setModal(true);
@@ -174,7 +278,26 @@ public class Pemasok extends javax.swing.JPanel {
 
     private void btn_ubahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ubahActionPerformed
         // TODO add your handling code here:
+        int selectedRow = tbl_pemasok.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data yang ingin diedit!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Ambil semua data dari tabel
+        DefaultTableModel model = (DefaultTableModel) tbl_pemasok.getModel();
+        String idPemasok = String.valueOf(model.getValueAt(selectedRow, 0));
+        String namaPemasok = String.valueOf(model.getValueAt(selectedRow, 1));
+        int noTelp = Integer.parseInt(String.valueOf(model.getValueAt(selectedRow, 2)));
+        String Alamat = String.valueOf(model.getValueAt(selectedRow, 3));
+        
         FormUbahPemasok panel = new FormUbahPemasok();
+        panel.setDataPemasok(idPemasok, namaPemasok, noTelp, Alamat);
+
+        // Listener untuk reload tabel setelah update
+        panel.setBarangUpdateListener(() -> {
+            load_pemasok();
+        });
 
         JDialog dialog = new JDialog();
         dialog.setTitle("Data Pemasok");
@@ -186,6 +309,44 @@ public class Pemasok extends javax.swing.JPanel {
         dialog.setVisible(true);
     }//GEN-LAST:event_btn_ubahActionPerformed
 
+    private void btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_hapusActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = tbl_pemasok.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data yang ingin dihapus!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) tbl_pemasok.getModel();
+        String idPemasok = (String) model.getValueAt(selectedRow, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin menghapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+
+            String sql = "DELETE FROM pemasok WHERE id_pemasok = ?";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, idPemasok);
+
+            int rowsAffected = pst.executeUpdate();
+
+            if (rowsAffected > 0) {
+                model.removeRow(selectedRow);
+                JOptionPane.showMessageDialog(this, "Data berhasil dihapus.", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Gagal menghapus data.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            pst.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Katalog error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_hapusActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_hapus;
@@ -194,7 +355,7 @@ public class Pemasok extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private palette.JTable_Custom2 jTable_Custom21;
     private palette.JTextField_Rounded search;
+    private palette.JTable_Custom2 tbl_pemasok;
     // End of variables declaration//GEN-END:variables
 }

@@ -8,65 +8,107 @@ import java.awt.Component;
 import view.Barang;
 import view.DashPegawai;
 import view.Katalog;
+import view.Laporan;
+import view.Login;
+import view.Login.Session;
 import view.Pelanggan;
 import view.Pemasok;
 import view.Pengembalian;
+import view.Pengguna;
 import view.Penyewaan;
 import view.StokMasuk;
 
 public class MainPegawai extends javax.swing.JFrame {
-   
-    public MainPegawai() {
-        initComponents();
-        getContentPane().setBackground(new Color(63, 109, 217));
-        
-        EventMenuSwitch switchEvent = new EventMenuSwitch() {
-            @Override
-            public void switchPanel(Component component) {
-                showMenu(component);
-            }
-        };
-        
-        MenuEvent event = new MenuEvent() {
-            @Override
-            public void menuSelected(int index) {
+    
+    String nama = Session.getNamaPengguna();
+    String role = Session.getRole();
+    
+    private DashPegawai dashPanel;
+    private Barang barangPanel;
+    private Katalog katalogPanel;
+    private Pelanggan pelangganPanel;
+    private Pemasok pemasokPanel;
+    private StokMasuk stokMasukPanel;
+    private Penyewaan penyewaanPanel;
+    private Pengembalian pengembalianPanel;
+    private Pengguna penggunaPanel;
+    private Laporan laporanPanel;
+    
+    public MainPegawai(String nama, String role) {
+    initComponents();
+    getContentPane().setBackground(new Color(63, 109, 217));
+
+    EventMenuSwitch switchEvent = new EventMenuSwitch() {
+        @Override
+        public void switchPanel(Component component) {
+            showMenu(component);
+        }
+    };
+
+    dashPanel = new DashPegawai();
+    barangPanel = new Barang(switchEvent);
+    katalogPanel = new Katalog();
+    pelangganPanel = new Pelanggan();
+    pemasokPanel = new Pemasok();
+    stokMasukPanel = new StokMasuk();
+    penyewaanPanel = new Penyewaan();
+    pengembalianPanel = new Pengembalian();
+    penggunaPanel = new Pengguna();
+    laporanPanel = new Laporan();
+
+    // Buat variabel event dulu
+    MenuEvent event = new MenuEvent() {
+        @Override
+        public void menuSelected(int index) {
+            if (role.equalsIgnoreCase("pegawai")) {
                 switch (index) {
-                    case 0:
-                        showMenu(new DashPegawai());
-                        break;
-                    case 1:
-                        showMenu(new Barang(switchEvent)); 
-                        break;
-                    case 2:
-                        showMenu(new Katalog());
-                        break;
-                    case 3:
-                        showMenu(new Pelanggan());
-                        break;
-                    case 4:
-                        showMenu(new Pemasok());
-                        break;
-                    case 5:
-                        showMenu(new StokMasuk());
-                        break;
-                    case 6:
-                        showMenu(new Penyewaan());
-                        break;
-                    case 7:
-                        showMenu(new Pengembalian());
-                        break;
-                    default:
-                        break;
+                    case 0 -> showMenu(dashPanel);
+                    case 1 -> showMenu(barangPanel);
+                    case 2 -> showMenu(katalogPanel);
+                    case 3 -> showMenu(pelangganPanel);
+                    case 4 -> showMenu(pemasokPanel);
+                    case 5 -> showMenu(stokMasukPanel);
+                    case 6 -> showMenu(penyewaanPanel);
+                    case 7 -> showMenu(pengembalianPanel);
+                }
+            } else if (role.equalsIgnoreCase("owner")) {
+                switch (index) {
+                    case 8 -> showMenu(penggunaPanel);
+                    case 9 -> showMenu(laporanPanel);
                 }
             }
-        };
-        menu.initMenu(event);
-        menu.setSelected(0);
-        
+
+            if (index == 99) {
+                dispose(); // logout
+                new Login().setVisible(true);
+            }
+        }
+    };
+
+    // Urutan yang benar:
+    menu.setUserLevel(role);  // <-- Set role dulu
+    menu.initMenu(event);     // <-- lalu inisialisasi menu berdasarkan role
+
+    // Pilih menu awal tergantung role
+    if (role.equalsIgnoreCase("owner")) {
+        menu.setSelected(8);  // buka menu Pengguna
+    } else {
+        menu.setSelected(0);  // buka Dashboard
+    }
+}
+
+
+ 
+    public Barang getBarangPanel() {
+        return barangPanel;
     }
 
-    
-
+    public void setPanel(Component c) {
+        getContentPane().removeAll();
+        getContentPane().add(c);
+        getContentPane().revalidate();
+        getContentPane().repaint();
+    }
     
     private void showMenu(Component com) {
         content.removeAll();
@@ -164,7 +206,7 @@ public class MainPegawai extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainPegawai().setVisible(true);
+                 new MainPegawai(Session.getNamaPengguna(), Session.getRole()).setVisible(true);
             }
         });
     }

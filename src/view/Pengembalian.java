@@ -1,14 +1,77 @@
 
 package view;
 
+import event.BarangUpdateListener;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterJob;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
+import view.Koneksi;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import java.awt.print.*;
+import static java.awt.print.Printable.NO_SUCH_PAGE;
+import static java.awt.print.Printable.PAGE_EXISTS;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import view.FormTambahPengembalian;
 
 
 public class Pengembalian extends javax.swing.JPanel {
 
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    
+    private final List<Integer> originalQuantities = new ArrayList<>();
+    private final List<String> listIdKembali = new ArrayList<>();
+    
     public Pengembalian() {
         initComponents();
+        
+        tampilDataPenyewaan();
         
         search.setText("Search");
         search.setForeground(Color.white);
@@ -31,6 +94,42 @@ public class Pengembalian extends javax.swing.JPanel {
             }
         });
     }
+    
+public void tampilDataPenyewaan() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Sewa");
+        model.addColumn("Nama Penyewa");
+        model.addColumn("Tgl Sewa");
+        model.addColumn("Tgl Rencana Kembali");
+        model.addColumn("Jaminan");
+
+        try {
+            String sql = "SELECT p.id_sewa, pl.nama_pelanggan, p.tgl_sewa, p.tgl_rencana_kembali, p.jaminan "
+                    + "FROM penyewaan p "
+                    + "JOIN pelanggan pl ON p.id_pelanggan = pl.id_pelanggan "
+                    + "WHERE p.Status != 'Sudah Kembali'";
+
+            Koneksi.config();
+            con = Koneksi.getConnection();
+            pst = con.prepareStatement(sql);
+            rs = pst.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("id_sewa"),
+                    rs.getString("nama_pelanggan"),
+                    rs.getDate("tgl_sewa"),
+                    rs.getDate("tgl_rencana_kembali"),
+                    rs.getString("jaminan")
+                });
+            }
+
+            table_kembali.setModel(model);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data: " + e.getMessage());
+        }
+
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -38,7 +137,7 @@ public class Pengembalian extends javax.swing.JPanel {
 
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable_Custom21 = new palette.JTable_Custom2();
+        table_kembali = new palette.JTable_Custom2();
         btn_retur = new javax.swing.JButton();
         btn_riwayat = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -50,7 +149,7 @@ public class Pengembalian extends javax.swing.JPanel {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Pengembalian");
 
-        jTable_Custom21.setModel(new javax.swing.table.DefaultTableModel(
+        table_kembali.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -68,7 +167,7 @@ public class Pengembalian extends javax.swing.JPanel {
                 "ID Sewa", "Tanggal Kembali", "Status", "Denda Keterlambatan", "Total Denda", "Bayar", "Kembalian"
             }
         ));
-        jScrollPane1.setViewportView(jTable_Custom21);
+        jScrollPane1.setViewportView(table_kembali);
 
         btn_retur.setContentAreaFilled(false);
 
@@ -76,6 +175,11 @@ public class Pengembalian extends javax.swing.JPanel {
         btn_retur.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_retur.png"))); // NOI18N
         btn_retur.setBorder(null);
         btn_retur.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_retur_select.png"))); // NOI18N
+        btn_retur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_returActionPerformed(evt);
+            }
+        });
 
         btn_riwayat.setContentAreaFilled(false);
 
@@ -147,6 +251,55 @@ public class Pengembalian extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_searchActionPerformed
 
+    private void btn_returActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_returActionPerformed
+        // TODO add your handling code here:
+        int selectedRow = table_kembali.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Harap pilih data yang ingin diretur!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String idSewa = table_kembali.getValueAt(selectedRow, 0).toString();
+        String namaPelanggan = table_kembali.getValueAt(selectedRow, 1).toString();
+        String tglRencanaKembali = table_kembali.getValueAt(selectedRow, 3).toString();
+        String jaminan = table_kembali.getValueAt(selectedRow, 4).toString();
+
+        LocalDate tglHariIni = LocalDate.now();
+        LocalDate tglRencana = LocalDate.parse(tglRencanaKembali);
+
+        long selisihHari = ChronoUnit.DAYS.between(tglRencana, tglHariIni);
+        String status;
+        int denda;
+
+        if (selisihHari > 0) {
+            status = "Terlambat";
+            denda = (int) selisihHari * 10000;
+        } else {
+            status = "Tepat Waktu";
+            denda = 0;
+        }
+
+        // Buat dan tampilkan dialog
+        FormTambahPengembalian panel = new FormTambahPengembalian();
+
+        // Kirim data ke panel (pastikan panel punya setter)
+        panel.setDataRetur(idSewa, namaPelanggan, tglHariIni.toString(), status, String.valueOf(denda), jaminan);
+        panel.setUpdateListener(() -> {
+            tampilDataPenyewaan();
+        });
+       
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Form Retur Penyewaan");
+        dialog.setModal(true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.getContentPane().add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+    }//GEN-LAST:event_btn_returActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_retur;
@@ -154,7 +307,7 @@ public class Pengembalian extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private palette.JTable_Custom2 jTable_Custom21;
     private palette.JTextField_Rounded search;
+    private palette.JTable_Custom2 table_kembali;
     // End of variables declaration//GEN-END:variables
 }

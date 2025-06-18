@@ -61,18 +61,20 @@
                   <EmptySpace min="16" pref="16" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="txt_nama" pref="308" max="32767" attributes="0"/>
-                                          <Component id="tgl_sewa" max="32767" attributes="0"/>
-                                      </Group>
+                                      <Component id="nama_penyewa" pref="308" max="32767" attributes="0"/>
+                                      <Component id="tgl_sewa" max="32767" attributes="0"/>
+                                      <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btn_calender" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btn_calender" min="-2" max="-2" attributes="0"/>
+                                      <Component id="cek" min="-2" pref="38" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
@@ -98,7 +100,7 @@
                                   <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel12" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txt_telp" alignment="0" min="-2" pref="353" max="-2" attributes="0"/>
+                              <Component id="no_hp" alignment="0" min="-2" pref="353" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="btn_lanjut" min="-2" pref="90" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -127,18 +129,24 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel2" alignment="1" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanelRounded1" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel2" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                          <Component id="jPanelRounded1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="77" max="-2" attributes="0"/>
                           <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txt_nama" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="cek" max="32767" attributes="0"/>
+                              <Component id="nama_penyewa" max="32767" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -156,7 +164,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                          <Component id="txt_telp" min="-2" max="-2" attributes="0"/>
+                          <Component id="no_hp" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -232,6 +240,9 @@
               <Image iconType="3" name="/assets/btn_batal_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_batalActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_batal.setContentAreaFilled(false);&#xa;&#xa;btn_batal.setBorderPainted(false);"/>
           </AuxValues>
@@ -247,7 +258,7 @@
             <Property name="text" type="java.lang.String" value="Nama Penyewa"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_nama">
+        <Component class="palette.JTextField_Rounded" name="nama_penyewa">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
@@ -261,6 +272,9 @@
           </Properties>
         </Component>
         <Component class="palette.JTextField_Rounded" name="tgl_sewa">
+          <Properties>
+            <Property name="text" type="java.lang.String" value=""/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel10">
           <Properties>
@@ -297,7 +311,7 @@
             <Property name="text" type="java.lang.String" value="Jaminan"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_telp">
+        <Component class="palette.JTextField_Rounded" name="no_hp">
         </Component>
         <Container class="palette.JPanelRounded" name="jPanelRounded1">
           <Properties>
@@ -480,6 +494,11 @@
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_calender.setContentAreaFilled(false);&#xa;&#xa;btn_calender.setBorderPainted(false);"/>
           </AuxValues>
         </Component>
+        <Component class="javax.swing.JButton" name="cek">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cekActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="palette.JPanelRounded" name="pn_barang_sewa">
@@ -516,6 +535,7 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jPanelRounded5" alignment="1" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jLabel46" min="-2" max="-2" attributes="0"/>
@@ -558,19 +578,21 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel45" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
+                                          <Component id="jLabel45" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
                                           <Component id="txt_jumlah" min="-2" pref="61" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="btn_tambah" min="-2" pref="90" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="btn_tambah" min="-2" pref="90" max="-2" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
                                           <Component id="btn_hapus" min="-2" pref="90" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
-                              <Component id="jPanelRounded5" alignment="1" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="15" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -636,7 +658,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="13" max="32767" attributes="0"/>
+                  <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -672,6 +694,9 @@
               <Image iconType="3" name="/assets/btn_tambah_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_tambahActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_lanjut.setContentAreaFilled(false);&#xa;&#xa;btn_lanjut.setBorderPainted(false);"/>
           </AuxValues>
@@ -688,6 +713,9 @@
               <Image iconType="3" name="/assets/btn_hapus_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_hapusActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_batal.setContentAreaFilled(false);&#xa;&#xa;btn_batal.setBorderPainted(false);"/>
           </AuxValues>
@@ -730,6 +758,9 @@
           </Properties>
         </Component>
         <Component class="palette.JTextField_Rounded" name="txt_jumlah">
+          <Events>
+            <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_jumlahKeyTyped"/>
+          </Events>
         </Component>
         <Component class="palette.JTextField_Rounded" name="search">
           <Events>
@@ -737,6 +768,9 @@
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btn_search">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_searchActionPerformed"/>
+          </Events>
         </Component>
         <Container class="palette.JPanelRounded" name="jPanelRounded5">
           <Properties>
@@ -777,7 +811,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="palette.JTable_Custom2" name="jTable_Custom21">
+                <Component class="palette.JTable_Custom2" name="table_barang">
                   <Properties>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="4" rowCount="4">
@@ -805,6 +839,10 @@
           </Properties>
         </Component>
         <Component class="palette.JTextField_Rounded" name="txt_bayar">
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_bayarKeyReleased"/>
+            <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_bayarKeyTyped"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel47">
           <Properties>
@@ -818,6 +856,9 @@
           </Properties>
         </Component>
         <Component class="palette.JTextField_Rounded" name="txt_total">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel48">
           <Properties>
@@ -831,6 +872,9 @@
           </Properties>
         </Component>
         <Component class="palette.JTextField_Rounded" name="txt_kembalian">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btn_simpan">
           <Properties>
@@ -844,6 +888,9 @@
               <Image iconType="3" name="/assets/btn_simpan_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_simpanActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_lanjut.setContentAreaFilled(false);&#xa;&#xa;btn_lanjut.setBorderPainted(false);"/>
           </AuxValues>
@@ -860,6 +907,9 @@
               <Image iconType="3" name="/assets/btn_kembali_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_kembaliActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_batal.setContentAreaFilled(false);&#xa;&#xa;btn_batal.setBorderPainted(false);"/>
           </AuxValues>

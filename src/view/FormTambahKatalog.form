@@ -129,6 +129,9 @@
               <Image iconType="3" name="/assets/btn_simpan_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_simpanActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_simpan.setContentAreaFilled(false);&#xa;&#xa;btn_simpan.setBorderPainted(false);"/>
           </AuxValues>
@@ -145,6 +148,9 @@
               <Image iconType="3" name="/assets/btn_batal_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_batalActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_batal.setContentAreaFilled(false);&#xa;&#xa;btn_batal.setBorderPainted(false);"/>
           </AuxValues>

@@ -1,15 +1,39 @@
 
 package view;
-
+import event.BarangUpdateListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class FormUbahKatalog extends javax.swing.JPanel {
 
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    
+    private String idKatalogYangSedangDiedit;
+    private BarangUpdateListener updateListener;
+    
     public FormUbahKatalog() {
         initComponents();
-      
+        
+        Koneksi DB = new Koneksi();
+        DB.config();
+        con = DB.con;    
         
     }
 
+    public void setDataKatalog(String idKatalog, String namaKatalog) {
+        this.idKatalogYangSedangDiedit = idKatalog;
+
+        txt_nama_katalog.setText(namaKatalog);
+    }
+    
+    public void setBarangUpdateListener(BarangUpdateListener listener) {
+        this.updateListener = listener;
+    }
    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -44,6 +68,11 @@ public class FormUbahKatalog extends javax.swing.JPanel {
         btn_simpan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan.png"))); // NOI18N
         btn_simpan.setBorder(null);
         btn_simpan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan_select.png"))); // NOI18N
+        btn_simpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_simpanActionPerformed(evt);
+            }
+        });
 
         btn_batal.setContentAreaFilled(false);
 
@@ -51,6 +80,11 @@ public class FormUbahKatalog extends javax.swing.JPanel {
         btn_batal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal.png"))); // NOI18N
         btn_batal.setBorder(null);
         btn_batal.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal_select.png"))); // NOI18N
+        btn_batal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_batalActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -111,6 +145,55 @@ public class FormUbahKatalog extends javax.swing.JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
+        // TODO add your handling code here:
+        String selectedIdBarang = this.idKatalogYangSedangDiedit;
+        String namaKatalog = txt_nama_katalog.getText().trim(); // Field nama yang diubah
+
+        if (idKatalogYangSedangDiedit.isEmpty() || namaKatalog.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "ID dan Nama katalog tidak boleh kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Cek apakah nama baru sudah digunakan oleh katalog lain
+            String cekSql = "SELECT COUNT(*) FROM katalog WHERE nama_katalog = ? AND id_katalog != ?";
+            PreparedStatement cekPst = con.prepareStatement(cekSql);
+            cekPst.setString(1, namaKatalog);
+            cekPst.setString(2, idKatalogYangSedangDiedit);
+            ResultSet rs = cekPst.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(this, "Nama katalog sudah digunakan!", "Duplikat", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Update data
+            String sql = "UPDATE katalog SET nama_katalog = ? WHERE id_katalog = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, namaKatalog);
+            pst.setString(2, idKatalogYangSedangDiedit);
+            pst.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Katalog berhasil diubah!");
+
+            // Trigger listener jika ada
+            if (updateListener != null) {
+                updateListener.onBarangUpdated();
+            }
+
+            // Tutup form ubah
+            SwingUtilities.getWindowAncestor(this).dispose();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal mengubah katalog: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btn_simpanActionPerformed
+
+    private void btn_batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_batalActionPerformed
+        // TODO add your handling code here:
+        SwingUtilities.getWindowAncestor(this).dispose();
+    }//GEN-LAST:event_btn_batalActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

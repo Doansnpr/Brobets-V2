@@ -60,14 +60,14 @@
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel12" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txt_stok" alignment="0" pref="374" max="32767" attributes="0"/>
+                      <Component id="txt_stok1" alignment="0" pref="374" max="32767" attributes="0"/>
                       <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txt_harga_beli" alignment="0" pref="374" max="32767" attributes="0"/>
+                      <Component id="txt_beli1" alignment="0" pref="374" max="32767" attributes="0"/>
                       <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txt_harga_sewa" alignment="0" pref="374" max="32767" attributes="0"/>
+                      <Component id="txt_harga1" alignment="0" pref="374" max="32767" attributes="0"/>
                       <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txt_nama_barang" alignment="0" pref="374" max="32767" attributes="0"/>
+                      <Component id="txt_nama1" alignment="0" pref="374" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="btn_simpan" min="-2" pref="90" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -78,8 +78,8 @@
                           <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="cb_katalog" alignment="0" max="32767" attributes="0"/>
-                      <Component id="cb_status" alignment="0" max="32767" attributes="0"/>
+                      <Component id="cmb_kategori_ubah" max="32767" attributes="0"/>
+                      <Component id="cmb_status_ubah" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="15" max="32767" attributes="0"/>
               </Group>
@@ -96,33 +96,33 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="btn_simpan" alignment="1" max="32767" attributes="0"/>
-                      <Component id="btn_batal" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btn_batal" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="txt_nama_barang" min="-2" max="-2" attributes="0"/>
+                  <Component id="txt_nama1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="txt_harga_sewa" min="-2" max="-2" attributes="0"/>
+                  <Component id="txt_harga1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="txt_harga_beli" min="-2" max="-2" attributes="0"/>
+                  <Component id="txt_beli1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                  <Component id="cmb_kategori_ubah" min="-2" pref="34" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="cb_katalog" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                   <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="txt_stok" min="-2" max="-2" attributes="0"/>
+                  <Component id="txt_stok1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="cb_status" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="25" max="32767" attributes="0"/>
+                  <Component id="cmb_status_ubah" min="-2" pref="34" max="-2" attributes="0"/>
+                  <EmptySpace pref="21" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -158,6 +158,9 @@
               <Image iconType="3" name="/assets/btn_simpan_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_simpanActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_simpan.setContentAreaFilled(false);&#xa;&#xa;btn_simpan.setBorderPainted(false);"/>
           </AuxValues>
@@ -174,6 +177,9 @@
               <Image iconType="3" name="/assets/btn_batal_select.png"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_batalActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="btn_batal.setContentAreaFilled(false);&#xa;&#xa;btn_batal.setBorderPainted(false);"/>
           </AuxValues>
@@ -189,7 +195,7 @@
             <Property name="text" type="java.lang.String" value="Nama Barang"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_nama_barang">
+        <Component class="palette.JTextField_Rounded" name="txt_nama1">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
@@ -202,7 +208,7 @@
             <Property name="text" type="java.lang.String" value="Harga Sewa"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_harga_sewa">
+        <Component class="palette.JTextField_Rounded" name="txt_harga1">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel10">
           <Properties>
@@ -215,7 +221,7 @@
             <Property name="text" type="java.lang.String" value="Harga Beli"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_harga_beli">
+        <Component class="palette.JTextField_Rounded" name="txt_beli1">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel11">
           <Properties>
@@ -239,7 +245,7 @@
             <Property name="text" type="java.lang.String" value="Stok"/>
           </Properties>
         </Component>
-        <Component class="palette.JTextField_Rounded" name="txt_stok">
+        <Component class="palette.JTextField_Rounded" name="txt_stok1">
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel13">
           <Properties>
@@ -252,9 +258,25 @@
             <Property name="text" type="java.lang.String" value="Status"/>
           </Properties>
         </Component>
-        <Component class="palette.JComboBox_Rounded" name="cb_katalog">
+        <Component class="javax.swing.JComboBox" name="cmb_kategori_ubah">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
-        <Component class="palette.JComboBox_Rounded" name="cb_status">
+        <Component class="javax.swing.JComboBox" name="cmb_status_ubah">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

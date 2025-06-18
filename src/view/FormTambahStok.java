@@ -1,12 +1,145 @@
 
 package view;
 
+import event.BarangUpdateListener;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
+import javax.swing.text.AbstractDocument;
 
 public class FormTambahStok extends javax.swing.JPanel {
 
+    Connection con;
+    PreparedStatement pst;
+    ResultSet rs;
+    private BarangUpdateListener updateListener;
+    private Map<String, String> barangMap = new HashMap<>();
+    private Map<String, String> pemasokMap = new HashMap<>();
+    private Map<String, String> katalogMap = new HashMap<>();
+
+    
     public FormTambahStok() {
         initComponents();
+        
+        Koneksi DB = new Koneksi();
+        DB.config();
+        con = DB.con;
+        
+        ((AbstractDocument) txt_jumlah.getDocument()).setDocumentFilter(new filter());
+        ((AbstractDocument) txt_harga_beli.getDocument()).setDocumentFilter(new FormatHarga());
+
+
+        loadBarangKeComboBox();
+        loadKatalogToComboBox();
+        loadPemasokToComboBox();
   
+    }
+    
+    private void loadKatalogToComboBox() {
+    cmb_katalog.removeAllItems();
+    katalogMap.clear(); // hapus data sebelumnya
+
+    try {
+        Koneksi.config();
+        Connection conn = Koneksi.getConnection();
+
+        String sql = "SELECT id_katalog, nama_katalog FROM katalog";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            String id = rs.getString("id_katalog");
+            String nama = rs.getString("nama_katalog");
+
+            katalogMap.put(nama, id); // simpan relasi nama -> id
+            cmb_katalog.addItem(nama); // tampilkan nama ke comboBox
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat data katalog: " + e.getMessage());
+    }
+}
+
+    private void loadBarangKeComboBox() {
+    DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+    barangMap.clear();
+
+    try {
+        Koneksi.config();
+        Connection conn = Koneksi.getConnection();
+        String sql = "SELECT id_barang, nama_barang FROM barang";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            String idBarang = rs.getString("id_barang");
+            String namaBarang = rs.getString("nama_barang");
+            barangMap.put(namaBarang, idBarang);
+            model.addElement(namaBarang);
+        }
+
+        cmb_pilihbarang.setModel(model);
+        cmb_pilihbarang.setSelectedIndex(-1); 
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat data barang: " + e.getMessage());
+    }
+}
+    
+    private void loadPemasokToComboBox() {
+    cmb_idpemasok.removeAllItems();
+    pemasokMap.clear(); // hapus data sebelumnya
+
+    try {
+        Koneksi.config();
+        Connection conn = Koneksi.getConnection();
+
+        String sql = "SELECT id_pemasok, nama_pemasok FROM pemasok";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            String id = rs.getString("id_pemasok");
+            String nama = rs.getString("nama_pemasok");
+
+            pemasokMap.put(nama, id); // simpan relasi nama -> id
+            cmb_idpemasok.addItem(nama); // tampilkan nama ke comboBox
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat data pemasok: " + e.getMessage());
+    }
+}
+    
+    public void setUpdateListener(BarangUpdateListener listener) {
+        this.updateListener = listener;
+    }
+    
+    private String generateID(String tableName, String idColumn, String prefix) {
+        String newID = prefix + "001";
+        try {
+            String sql = "SELECT " + idColumn + " FROM " + tableName + 
+                         " WHERE " + idColumn + " LIKE ? ORDER BY " + idColumn + " DESC LIMIT 1";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, prefix + "%");
+            rs = pst.executeQuery();
+            if (rs.next()) {
+                String lastID = rs.getString(1); // Misal: BMS006
+                int num = Integer.parseInt(lastID.substring(prefix.length())); // 6
+                num++; // 7
+                newID = prefix + String.format("%03d", num); // BMS007
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal generate ID: " + e.getMessage());
+        }
+        return newID;
     }
 
    
@@ -20,7 +153,6 @@ public class FormTambahStok extends javax.swing.JPanel {
         jLabel7 = new javax.swing.JLabel();
         btn_simpan = new javax.swing.JButton();
         btn_batal = new javax.swing.JButton();
-        txt_nama_barang = new palette.JTextField_Rounded();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         txt_harga_beli = new palette.JTextField_Rounded();
@@ -28,8 +160,9 @@ public class FormTambahStok extends javax.swing.JPanel {
         txt_jumlah = new palette.JTextField_Rounded();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        cb_pemasok = new palette.JComboBox_Rounded();
-        cb_katalog = new palette.JComboBox_Rounded();
+        cmb_katalog = new javax.swing.JComboBox<>();
+        cmb_idpemasok = new javax.swing.JComboBox<>();
+        cmb_pilihbarang = new javax.swing.JComboBox<>();
 
         jTextField_Rounded1.setText("jTextField_Rounded1");
 
@@ -51,6 +184,11 @@ public class FormTambahStok extends javax.swing.JPanel {
         btn_simpan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan.png"))); // NOI18N
         btn_simpan.setBorder(null);
         btn_simpan.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_simpan_select.png"))); // NOI18N
+        btn_simpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_simpanActionPerformed(evt);
+            }
+        });
 
         btn_batal.setContentAreaFilled(false);
 
@@ -58,6 +196,11 @@ public class FormTambahStok extends javax.swing.JPanel {
         btn_batal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal.png"))); // NOI18N
         btn_batal.setBorder(null);
         btn_batal.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/btn_batal_select.png"))); // NOI18N
+        btn_batal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_batalActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -102,9 +245,9 @@ public class FormTambahStok extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_batal, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel8)
-                    .addComponent(txt_nama_barang, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
-                    .addComponent(cb_pemasok, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
-                    .addComponent(cb_katalog, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE))
+                    .addComponent(cmb_katalog, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmb_idpemasok, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmb_pilihbarang, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(17, 17, 17))
         );
         pn_tambahLayout.setVerticalGroup(
@@ -120,13 +263,13 @@ public class FormTambahStok extends javax.swing.JPanel {
                     .addComponent(btn_batal, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(17, 17, 17)
                 .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_nama_barang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(cmb_pilihbarang, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel10)
+                .addGap(4, 4, 4)
+                .addComponent(cmb_katalog, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cb_katalog, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txt_harga_beli, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -137,8 +280,8 @@ public class FormTambahStok extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cb_pemasok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addComponent(cmb_idpemasok, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -158,12 +301,88 @@ public class FormTambahStok extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
+        String selectedNamaBarang = (String) cmb_pilihbarang.getSelectedItem();
+        if (selectedNamaBarang == null || selectedNamaBarang.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Pilih barang terlebih dahulu!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+
+        String idBarang = barangMap.get(selectedNamaBarang);
+        if (idBarang == null) {
+            JOptionPane.showMessageDialog(this, "Barang tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String jumlahStr = txt_jumlah.getText().trim();
+        String hargaStr = txt_harga_beli.getText().replaceAll("[^\\d]", ""); // Hapus "Rp" dan titik
+        String namaKatalog = (String) cmb_katalog.getSelectedItem();
+        String idKatalog = katalogMap.get(namaKatalog); 
+        String namaPemasok = (String) cmb_idpemasok.getSelectedItem();
+        String idPemasok = pemasokMap.get(namaPemasok);
+        
+        if (jumlahStr.isEmpty() || hargaStr.isEmpty() || idKatalog.isEmpty() || idPemasok == null || idPemasok.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            int qty = Integer.parseInt(jumlahStr);
+            int harga = Integer.parseInt(hargaStr);
+
+
+
+            Koneksi.config();
+            Connection conn = Koneksi.getConnection();
+            String idStokMasuk = generateID("stok_masuk", "id_stok_masuk", "SM");
+
+
+            // 1. INSERT ke stok_masuk
+            String sqlInsert = "INSERT INTO stok_masuk (id_stok_masuk, id_barang, id_katalog, qty, harga, id_pemasok) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement pstInsert = conn.prepareStatement(sqlInsert);
+            pstInsert.setString(1, idStokMasuk);
+            pstInsert.setString(2, idBarang);
+            pstInsert.setString(3, idKatalog);
+            pstInsert.setInt(4, qty);
+            pstInsert.setInt(5, harga);
+            pstInsert.setString(6, idPemasok);
+            pstInsert.executeUpdate();
+
+            // 2. UPDATE stok barang
+            String sqlUpdate = "UPDATE barang SET stok = stok + ? WHERE id_barang = ?";
+            PreparedStatement pstUpdate = conn.prepareStatement(sqlUpdate);
+            pstUpdate.setInt(1, qty);
+            pstUpdate.setString(2, idBarang);
+            pstUpdate.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
+
+           if (updateListener != null) {
+                updateListener.onBarangUpdated();
+            }
+
+            SwingUtilities.getWindowAncestor(this).dispose();
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Jumlah dan harga harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_simpanActionPerformed
+
+    private void btn_batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_batalActionPerformed
+        // TODO add your handling code here:
+        SwingUtilities.getWindowAncestor(this).dispose();
+    }//GEN-LAST:event_btn_batalActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_batal;
     private javax.swing.JButton btn_simpan;
-    private palette.JComboBox_Rounded cb_katalog;
-    private palette.JComboBox_Rounded cb_pemasok;
+    private javax.swing.JComboBox<String> cmb_idpemasok;
+    private javax.swing.JComboBox<String> cmb_katalog;
+    private javax.swing.JComboBox<String> cmb_pilihbarang;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -175,6 +394,5 @@ public class FormTambahStok extends javax.swing.JPanel {
     private palette.JPanelRounded pn_tambah;
     private palette.JTextField_Rounded txt_harga_beli;
     private palette.JTextField_Rounded txt_jumlah;
-    private palette.JTextField_Rounded txt_nama_barang;
     // End of variables declaration//GEN-END:variables
 }
